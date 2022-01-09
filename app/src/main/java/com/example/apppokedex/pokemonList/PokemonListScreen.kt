@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -20,9 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -64,8 +63,10 @@ fun PokemonListScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ){
-
+                    
                 }
+            Spacer(modifier = Modifier.height(16.dp))
+            PokemonList(navController = navController)
         }
     }
 }
@@ -96,8 +97,7 @@ fun SearchBar(
                 .background(Color.White, CircleShape)
                 .padding(20.dp, 12.dp)
                 .onFocusChanged {
-                    //todo we have a problem( (part 3)
-                    //isHintDisplay = it != FocusState.Active
+                    isHintDisplay = !it.isFocused
                 }
         )
         if(isHintDisplay){
@@ -107,6 +107,35 @@ fun SearchBar(
                 modifier = Modifier
                     .padding(20.dp,12.dp)
             )
+        }
+    }
+}
+
+@Composable
+fun PokemonList(
+    navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
+) {
+    val pokemonList by remember { viewModel.pokemonList }
+    val endReached by remember { viewModel.endReached }
+    val loadError by remember { viewModel.loadError }
+    val isLoading by remember { viewModel.isLoading }
+
+    LazyColumn(contentPadding = PaddingValues(16.dp))
+    {
+        val itemCount = if(pokemonList.size % 2 == 0){
+            pokemonList.size / 2
+        }else
+        {
+            pokemonList.size / 2 + 1
+        }
+        items(itemCount)
+        {
+            if(it >= itemCount -1 && !endReached)
+            {
+                viewModel.loadPokemonPaginated()
+            }
+            PokeRow(rowIndex = it, entries = pokemonList, navController = navController)
         }
     }
 }
