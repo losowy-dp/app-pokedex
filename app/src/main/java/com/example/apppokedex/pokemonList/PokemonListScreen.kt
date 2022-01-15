@@ -63,7 +63,7 @@ fun PokemonListScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ){
-                    
+                    //
                 }
             Spacer(modifier = Modifier.height(16.dp))
             PokemonList(navController = navController)
