@@ -35,11 +35,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.Coil
+import coil.compose.ImagePainter
+import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.apppokedex.R
 import com.example.apppokedex.models.PokedexListEntry
 import com.example.apppokedex.ui.theme.Roboto
 import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.imageloading.ImageLoadState
 
 @Composable
 fun PokemonListScreen(
@@ -151,7 +155,12 @@ fun PokedexEntery(
     var dominantColor by remember {
         mutableStateOf(defaultDominantColor)
     }
-
+    val painter = rememberImagePainter(
+        data = entry.imageUrl,
+        builder = {
+            crossfade(true)
+        }
+    )
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
@@ -173,7 +182,32 @@ fun PokedexEntery(
           }
     ){
         Column {
-            CoilImage(
+            Image(
+                painter = painter,
+                contentDescription = entry.pokemonName,
+                modifier = Modifier
+                    .size(120.dp)
+                    .align(CenterHorizontally)
+
+            )
+            when(painter.state){
+                is ImagePainter.State.Loading -> {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier.scale(0.5f)
+                    )
+                }
+                is ImagePainter.State.Success -> {
+                    Text(
+                        text = entry.pokemonName,
+                        fontFamily = Roboto,
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+/*            CoilImage(
                 request = ImageRequest.Builder(LocalContext.current)
                     .data(entry.imageUrl)
                     .target
@@ -188,7 +222,8 @@ fun PokedexEntery(
                 modifier = Modifier
                     .size(120.dp)
                     .align(CenterHorizontally)
-            ) {
+            )*/
+/*            {
                 CircularProgressIndicator(
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier.scale(0.5f)
@@ -200,7 +235,8 @@ fun PokedexEntery(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
-            }
+            }*/
+
         }
     }
 }
