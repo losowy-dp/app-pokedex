@@ -248,7 +248,7 @@ fun PokeRow(
     navController: NavController
 ) {
     Column {
-        Row{
+        Row(modifier = Modifier.size(width = 400.dp, height = 170.dp)) {
             PokedexEntery(
                 entry = entries[rowIndex * 2],
                 navController = navController,
