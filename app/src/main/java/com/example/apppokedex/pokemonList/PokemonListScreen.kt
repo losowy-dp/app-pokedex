@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -40,6 +41,7 @@ import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.example.apppokedex.R
+import com.example.apppokedex.data.remote.responses.Pokemon
 import com.example.apppokedex.models.PokedexListEntry
 import com.example.apppokedex.ui.theme.Roboto
 import com.google.accompanist.coil.CoilImage
@@ -149,7 +151,8 @@ fun PokedexEntery(
     entry: PokedexListEntry,
     navController: NavController,
     modifier: Modifier = Modifier,
-    viewModel: PokemonListViewModel = hiltViewModel()
+    viewModel: PokemonListViewModel = hiltViewModel(),
+    pokemonDwa: Boolean = false
 ) {
     val defaultDominantColor = MaterialTheme.colors.surface
     var dominantColor by remember {
@@ -163,10 +166,10 @@ fun PokedexEntery(
     )
     Box(
       contentAlignment = Alignment.Center,
-      modifier = Modifier
+      modifier = if(pokemonDwa == true){Modifier
           .shadow(5.dp, RoundedCornerShape(10.dp))
           .clip(RoundedCornerShape(10.dp))
-          .aspectRatio(1f)
+          .fillMaxWidth(1f)
           .background(
               Brush.verticalGradient(
                   listOf(
@@ -179,7 +182,24 @@ fun PokedexEntery(
               navController.navigate(
                   "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
               )
-          }
+          }}else{Modifier
+          .shadow(5.dp, RoundedCornerShape(10.dp))
+          .clip(RoundedCornerShape(10.dp))
+          .fillMaxWidth(0.5f)
+          .background(
+              Brush.verticalGradient(
+                  listOf(
+                      dominantColor,
+                      defaultDominantColor
+                  )
+              )
+          )
+          .clickable {
+              navController.navigate(
+                  "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
+              )
+          }}
+
     ){
         Column {
             Image(
@@ -207,36 +227,6 @@ fun PokedexEntery(
                     )
                 }
             }
-/*            CoilImage(
-                request = ImageRequest.Builder(LocalContext.current)
-                    .data(entry.imageUrl)
-                    .target
-                    {
-                        viewModel.calcDominantColor(it){ color ->
-                            dominantColor = color
-                        }
-                    }
-                    .build(),
-                contentDescription = entry.pokemonName,
-                fadeIn = true,
-                modifier = Modifier
-                    .size(120.dp)
-                    .align(CenterHorizontally)
-            )*/
-/*            {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colors.primary,
-                    modifier = Modifier.scale(0.5f)
-                )
-                Text(
-                    text = entry.pokemonName,
-                    fontFamily = Roboto,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }*/
-
         }
     }
 }
@@ -248,19 +238,21 @@ fun PokeRow(
     navController: NavController
 ) {
     Column {
-        Row(modifier = Modifier.size(width = 400.dp, height = 170.dp)) {
+        Row  {
             PokedexEntery(
                 entry = entries[rowIndex * 2],
                 navController = navController,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxSize()
             )
             Spacer(modifier = Modifier.width(16.dp))
             if(entries.size >= rowIndex * 2 + 2){
                 PokedexEntery(
                     entry = entries[rowIndex * 2 + 1],
                     navController = navController,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxSize(),
+                    pokemonDwa = true
                 )
+
             } else{
                 Spacer(modifier = Modifier.weight(1f))
             }
