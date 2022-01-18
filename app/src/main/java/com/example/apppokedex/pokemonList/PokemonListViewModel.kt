@@ -50,7 +50,17 @@ class PokemonListViewModel @Inject constructor(
                             entry.url.takeLastWhile { it.isDigit() }
                         }
                         val url = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png"
-                        PokedexListEntry(entry.name.capitalize(Locale.ROOT), url, number.toInt() )
+                        val resultForSinglePokemon = repository.getPokemonInfo(entry.name)
+                        var typeColor = "normal"
+                        when(resultForSinglePokemon){
+                            is Resourses.Success -> {
+                                if(resultForSinglePokemon.data?.types?.get(0)?.type?.name.toString()=="unknown" || resultForSinglePokemon.data?.types?.get(0)?.type?.name.toString()=="shadow")
+                                    typeColor = "normal"
+                                else
+                                    typeColor = resultForSinglePokemon.data?.types?.get(0)?.type?.name.toString()
+                            }
+                        }
+                        PokedexListEntry(entry.name.capitalize(Locale.ROOT), url, number.toInt(),typeColor )
                     }
                     curPage++
 
