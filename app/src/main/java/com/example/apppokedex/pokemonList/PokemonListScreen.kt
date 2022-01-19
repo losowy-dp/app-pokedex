@@ -21,8 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -43,9 +41,8 @@ import coil.request.ImageRequest
 import com.example.apppokedex.R
 import com.example.apppokedex.data.remote.responses.Pokemon
 import com.example.apppokedex.models.PokedexListEntry
-import com.example.apppokedex.ui.theme.Roboto
-import com.google.accompanist.coil.CoilImage
-import com.google.accompanist.imageloading.ImageLoadState
+import com.example.apppokedex.ui.theme.*
+import com.example.apppokedex.util.ColorsForGradient
 
 @Composable
 fun PokemonListScreen(
@@ -173,7 +170,7 @@ fun PokedexEntery(
           .background(
               Brush.verticalGradient(
                   listOf(
-                      dominantColor,
+                      addColorDominant(entry.colorType),
                       defaultDominantColor
                   )
               )
@@ -189,7 +186,7 @@ fun PokedexEntery(
           .background(
               Brush.verticalGradient(
                   listOf(
-                      dominantColor,
+                      addColorDominant(entry.colorType),
                       defaultDominantColor
                   )
               )
@@ -207,7 +204,8 @@ fun PokedexEntery(
                 contentDescription = entry.pokemonName,
                 modifier = Modifier
                     .size(120.dp)
-                    .align(CenterHorizontally)
+                    .align(CenterHorizontally),
+
 
             )
             when(painter.state){
@@ -229,6 +227,29 @@ fun PokedexEntery(
             }
         }
     }
+}
+
+fun addColorDominant(colorType: String): Color {
+    when(colorType){
+        "normal"-> return TypeNormal
+        "fighting" -> return TypeFighting
+        "flying" -> return TypeFlying
+        "poison" -> return TypePoison
+        "ground" -> return TypeGround
+        "rock" -> return TypeRock
+        "bug" -> return TypeBug
+        "ghost" -> return TypeGhost
+        "steel" -> return TypeSteel
+        "fire" -> return TypeFire
+        "water" -> return TypeWater
+        "grass" -> return TypeGrass
+        "electric" -> return TypeElectric
+        "ice" -> return TypeIce
+        "dragon" -> return TypeDragon
+        "dark" -> return TypeDark
+        "fairy" -> return TypeFairy
+    }
+    return TypeNormal
 }
 
 @Composable
