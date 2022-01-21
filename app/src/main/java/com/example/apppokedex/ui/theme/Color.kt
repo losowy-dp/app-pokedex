@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 
 val LightBlue = Color(0xFFBAC7FF)
 val LightGray = Color(0xFFAAAAAA)
-
+val White = Color(0XFFFFFFFF)
 
 //Colors to Stats Pokemon
 val HpColor = Color(0xFFFF0000)
