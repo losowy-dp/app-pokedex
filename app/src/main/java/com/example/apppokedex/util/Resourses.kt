@@ -14,7 +14,5 @@ sealed class Resourses<T>(
 
     ): Resourses<T>(data,message)
 
-    class Loading<T>(
-        data: T?=null
-    ): Resourses<T>(data)
+    class Loading<T>(): Resourses<T>()
 }

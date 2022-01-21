@@ -32,8 +32,11 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.HiltViewModelFactory
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import coil.Coil
 import coil.compose.ImagePainter
 import coil.compose.rememberImagePainter
@@ -46,7 +49,8 @@ import com.example.apppokedex.util.ColorsForGradient
 
 @Composable
 fun PokemonListScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     Surface(
         color = MaterialTheme.colors.background,
@@ -66,7 +70,7 @@ fun PokemonListScreen(
                         .fillMaxWidth()
                         .padding(16.dp)
                 ){
-                    //
+                    viewModel.searchPokemonList(it)
                 }
             Spacer(modifier = Modifier.height(16.dp))
             PokemonList(navController = navController)
@@ -77,7 +81,7 @@ fun PokemonListScreen(
 @Composable
 fun SearchBar(
     modifier: Modifier = Modifier,
-    hint: String = "",
+    hint: String = "Search",
     onSearch: (String) -> Unit = {}
 )
 {
@@ -100,7 +104,7 @@ fun SearchBar(
                 .background(Color.White, CircleShape)
                 .padding(20.dp, 12.dp)
                 .onFocusChanged {
-                    isHintDisplay = !it.isFocused
+                    isHintDisplay = !it.isFocused && text.isNotEmpty()
                 }
         )
         if(isHintDisplay){
@@ -123,7 +127,7 @@ fun PokemonList(
     val endReached by remember { viewModel.endReached }
     val loadError by remember { viewModel.loadError }
     val isLoading by remember { viewModel.isLoading }
-
+    val isSearching by remember { viewModel.isSearching }
     LazyColumn(contentPadding = PaddingValues(16.dp))
     {
         val itemCount = if(pokemonList.size % 2 == 0){
@@ -134,7 +138,7 @@ fun PokemonList(
         }
         items(itemCount)
         {
-            if(it >= itemCount -1 && !endReached)
+            if(it >= itemCount -1 && !endReached && !isLoading && !isSearching)
             {
                 viewModel.loadPokemonPaginated()
             }
@@ -152,9 +156,7 @@ fun PokedexEntery(
     pokemonDwa: Boolean = false
 ) {
     val defaultDominantColor = MaterialTheme.colors.surface
-    var dominantColor by remember {
-        mutableStateOf(defaultDominantColor)
-    }
+    var dominantColor = addColorDominant(entry.colorType)
     val painter = rememberImagePainter(
         data = entry.imageUrl,
         builder = {
@@ -163,39 +165,41 @@ fun PokedexEntery(
     )
     Box(
       contentAlignment = Alignment.Center,
-      modifier = if(pokemonDwa == true){Modifier
-          .shadow(5.dp, RoundedCornerShape(10.dp))
-          .clip(RoundedCornerShape(10.dp))
-          .fillMaxWidth(1f)
-          .background(
-              Brush.verticalGradient(
-                  listOf(
-                      addColorDominant(entry.colorType),
-                      defaultDominantColor
+      modifier = if(pokemonDwa == true){
+          Modifier
+              .shadow(5.dp, RoundedCornerShape(10.dp))
+              .clip(RoundedCornerShape(10.dp))
+              .fillMaxWidth(1f)
+              .background(
+                  Brush.verticalGradient(
+                      listOf(
+                          addColorDominant(entry.colorType),
+                          defaultDominantColor
+                      )
                   )
               )
-          )
-          .clickable {
-              navController.navigate(
-                  "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
-              )
-          }}else{Modifier
-          .shadow(5.dp, RoundedCornerShape(10.dp))
-          .clip(RoundedCornerShape(10.dp))
-          .fillMaxWidth(0.5f)
-          .background(
-              Brush.verticalGradient(
-                  listOf(
-                      addColorDominant(entry.colorType),
-                      defaultDominantColor
+              .clickable {
+                  navController.navigate(
+                      "pokedex_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
+                  )
+              }}else{
+          Modifier
+              .shadow(5.dp, RoundedCornerShape(10.dp))
+              .clip(RoundedCornerShape(10.dp))
+              .fillMaxWidth(0.5f)
+              .background(
+                  Brush.verticalGradient(
+                      listOf(
+                          addColorDominant(entry.colorType),
+                          defaultDominantColor
+                      )
                   )
               )
-          )
-          .clickable {
-              navController.navigate(
-                  "pokemon_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
-              )
-          }}
+              .clickable {
+                  navController.navigate(
+                      "pokedex_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
+                  )
+              }}
 
     ){
         Column {

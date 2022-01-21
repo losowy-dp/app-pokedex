@@ -8,12 +8,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.capitalize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.palette.graphics.Palette
 import com.example.apppokedex.models.PokedexListEntry
 import com.example.apppokedex.repository.PokemonRepository
 import com.example.apppokedex.util.Constants.PAGE_SIZE
 import com.example.apppokedex.util.Resourses
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -30,9 +32,44 @@ class PokemonListViewModel @Inject constructor(
     var isLoading = mutableStateOf(false)
     var endReached = mutableStateOf(false)
 
+    private var cachedPokedexList = listOf<PokedexListEntry>()
+    private var isSearchStarting = true
+    var isSearching = mutableStateOf(false)
+
     init
     {
         loadPokemonPaginated()
+    }
+
+    fun searchPokemonList(query: String){
+        val listToSearch = if(isSearchStarting)
+        {
+            pokemonList.value
+        }
+        else
+        {
+            cachedPokedexList
+        }
+        viewModelScope.launch (Dispatchers.Default)
+        {
+            if(query.isEmpty())
+            {
+                pokemonList.value = cachedPokedexList
+                isSearching.value = false
+                isSearchStarting = true
+                return@launch
+            }
+            val results = listToSearch.filter {
+                it.pokemonName.contains(query.trim(),ignoreCase = true) ||
+                        it.number.toString() == query.trim()
+            }
+            if(isSearchStarting){
+                cachedPokedexList = pokemonList.value
+                isSearchStarting = false
+            }
+            pokemonList.value = results
+            isSearching.value = true
+        }
     }
 
     fun loadPokemonPaginated(){
