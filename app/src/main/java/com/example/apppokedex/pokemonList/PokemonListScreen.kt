@@ -165,11 +165,11 @@ fun PokedexEntery(
     )
     Box(
       contentAlignment = Alignment.Center,
-      modifier = if(pokemonDwa == true){
+      modifier =
           Modifier
               .shadow(5.dp, RoundedCornerShape(10.dp))
               .clip(RoundedCornerShape(10.dp))
-              .fillMaxWidth(1f)
+              .fillMaxWidth(if(pokemonDwa == true ){1f}else{0.5f})
               .background(
                   Brush.verticalGradient(
                       listOf(
@@ -182,24 +182,7 @@ fun PokedexEntery(
                   navController.navigate(
                       "pokedex_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
                   )
-              }}else{
-          Modifier
-              .shadow(5.dp, RoundedCornerShape(10.dp))
-              .clip(RoundedCornerShape(10.dp))
-              .fillMaxWidth(0.5f)
-              .background(
-                  Brush.verticalGradient(
-                      listOf(
-                          addColorDominant(entry.colorType),
-                          defaultDominantColor
-                      )
-                  )
-              )
-              .clickable {
-                  navController.navigate(
-                      "pokedex_detail_screen/${dominantColor.toArgb()}/${entry.pokemonName}"
-                  )
-              }}
+              }
 
     ){
         Column {
